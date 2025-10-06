@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import Sidebar from "./pages/Sidebar";
+import { Route, Routes } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import ChatBox from "./components/ChatBox";
+import Classes from "./pages/Classes";
+import Teachers from "./pages/Teachers";
+import Students from "./pages/Students";
+import AllUsers from "./pages/AllUsers";
+import UploadDocument from "./pages/UploadDocument";
+import AddClass from "./pages/AddClass";
+import Admins from "./pages/Admins";
+import Message from "./components/Message";
+import Documents from "./pages/Documents";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="text-lg border">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="h-screen w-screen flex">
+      {/* Sidebar on the left */}
+      <Sidebar />
 
-export default App
+      {/* Main content on the right */}
+      <div className="flex-1 p-4 overflow-auto bg-gray-100">
+        <Routes>
+          <Route path="/" element={<ChatBox />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/classes" element={<Classes />} />
+          <Route path="/teachers" element={<Teachers />} />
+          <Route path="/students" element={<Students />} />
+          <Route path="/admins" element={<Admins />} />
+          <Route path="/allusers" element={<AllUsers />} />
+          <Route path="/upload" element={<UploadDocument />} />
+          <Route path="/add-class" element={<AddClass />} />
+          <Route path="/message" element={<Message />} />
+          <Route path="/documents" element={<Documents />} />
+        </Routes>
+      </div>
+    </div>
+  );
+};
+
+export default App;

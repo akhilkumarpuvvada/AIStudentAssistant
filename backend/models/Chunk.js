@@ -4,7 +4,7 @@ const chunkSchema = new mongoose.Schema(
   {
     docId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: "Document" },
     text: { type: String, required: true },
-    embeddingVectorId: { type: String, required: true },
+    embedding: { type: [Number] },
     position: { type: Number, required: true },
   },
   { timestamps: true }

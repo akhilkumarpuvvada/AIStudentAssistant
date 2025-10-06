@@ -12,14 +12,29 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@lancedb/lancedb": "^0.12.0",
+    "@langchain/community": "^0.3.55",
+    "@langchain/core": "^0.3.75",
+    "@langchain/langgraph": "^0.4.9",
+    "@langchain/openai": "^0.6.14",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
-    "cloudinary": "^2.7.0",
+    "body-parser": "^2.2.0",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.2",
+    "dotenv": "^16.6.1",
     "express": "^5.1.0",
+    "fs": "^0.0.1-security",
     "jsonwebtoken": "^9.0.2",
+    "langchain": "^0.3.33",
     "mongoose": "^8.18.2",
     "multer": "^2.0.2",
-    "nodemon": "^3.1.10"
+    "multer-storage-cloudinary": "^4.0.0",
+    "nodemon": "^3.1.10",
+    "openai": "^4.104.0",
+    "pdf-parse": "^1.1.1",
+    "streamifier": "^0.1.1",
+    "wink-bm25-text-search": "^3.1.2",
+    "zod": "^3.25.76"
   }
 }
