@@ -1,14 +1,15 @@
 import express from "express";
 import upload from "../utils/fileUpload.js";
-import { deleteDocument, getAllDocuments, getAllDocumentsByUser, getDocumentById, uploadDocument } from "../controllers/DocumentController.js";
+import { deleteDocument, getAllDocuments, getAllDocumentsByUser, getDocumentById, uploadDocument, updateDocument } from "../controllers/DocumentController.js";
+import {isAuthenticated, requireRole} from "../middlewares/auth.js";
 
 const documentRouter = express.Router();
 
-documentRouter.post("/upload", upload.single("file"), uploadDocument);
-documentRouter.get("/", getAllDocuments);
-documentRouter.get("/user/:id", getAllDocumentsByUser);
-documentRouter.get("/:id", getDocumentById);
-documentRouter.put("/update/:id", uploadDocument);
-documentRouter.delete("/delete/:id", deleteDocument);
+documentRouter.post("/upload", upload.single("file"), isAuthenticated, uploadDocument);
+documentRouter.get("/", isAuthenticated, requireRole("admin"), getAllDocuments);
+documentRouter.get("/user", isAuthenticated, getAllDocumentsByUser);
+documentRouter.get("/:id", isAuthenticated, getDocumentById);
+documentRouter.put("/update/:id", isAuthenticated, updateDocument);
+documentRouter.delete("/delete/:id", isAuthenticated, deleteDocument);
 
 export default documentRouter;

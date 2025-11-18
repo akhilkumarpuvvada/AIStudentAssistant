@@ -1,5 +1,7 @@
 import { FileText, Trash2 } from "lucide-react";
 import axios from "axios";
+import toast from "react-hot-toast";
+
 export default function DocumentTable({ docs }) {
 
   const deleteDocument = async (id) => {
@@ -7,10 +9,11 @@ export default function DocumentTable({ docs }) {
     if(!confirm) return;
    try{
     const {data} = await axios.delete(`http://localhost:5000/api/document/delete/${id}`);
-    if(data.success) alert("Document deleted Successfully");
+    if(data.success) toast.success("Document deleted Successfully");
    }
    catch(error) {
     console.log(error);
+    toast.error("Document deletion Failed!")
    }
   }
   

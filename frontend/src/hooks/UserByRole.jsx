@@ -1,42 +1,28 @@
-// src/hooks/useUsersByRole.js
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { useAppContext } from "../context/AppContext";
 
 export const useUsersByRole = () => {
   const [admins, setAdmins] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
-  const [classes, setClasses] = useState([]);
+  const { api } = useAppContext();
 
   const fetchUsers = async (role, setter) => {
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/user/role/${role}`);
-      
+      const { data } = await api.get(`/user/role/${role}`);
       if (data.success) setter(data.data);
-    } catch {
-      console.log(`Error fetching ${role}`);
+    } catch (error) {
+      console.error(`Error fetching ${role}:`, error.message);
     }
   };
 
-
-  const fetchClasses = async () => {
-    try {
-      const { data } = await axios.get(`http://localhost:5000/api/class`);
-      
-      
-      if (data.success) {
-        setClasses(data.data);
-      };
-    } catch {
-      console.log(`Error`);
-    }
-  };
   useEffect(() => {
-    fetchUsers("teacher", setTeachers);
-    fetchUsers("student", setStudents);
-    fetchUsers("admin", setAdmins);
-    fetchClasses();
+    Promise.all([
+      fetchUsers("teacher", setTeachers),
+      fetchUsers("student", setStudents),
+      fetchUsers("admin", setAdmins),
+    ]);
   }, []);
 
-  return { admins, teachers, students, classes };
+  return { admins, teachers, students };
 };

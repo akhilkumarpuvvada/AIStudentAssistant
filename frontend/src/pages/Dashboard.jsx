@@ -1,10 +1,12 @@
 import { Users, BookOpen, GraduationCap, UserCog } from "lucide-react";
 import { useUsersByRole } from "../hooks/UserByRole";
+import { useAppContext } from "../context/AppContext";
 
 const Dashboard = () => {
  
-  const { admins, students, teachers, classes} = useUsersByRole();
-
+  const { admins, students, teachers} = useUsersByRole();
+  const { classes } = useAppContext();
+  
   return (
     <div className="p-10 min-h-screen">
       <p className="text-3xl font-bold mb-6">Dashboard</p>

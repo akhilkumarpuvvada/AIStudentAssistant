@@ -9,7 +9,8 @@ import userModel from "../models/User.js";
 
 const uploadDocument = async (req, res) => {
   try {
-    const { name, ownerType, ownerId, uploaderId } = req.body;
+    const { name, ownerType, ownerId } = req.body;
+    const uploaderId = req.session.user._id;
 
     if (!req.file || !req.file.path) {
       return res.json({ success: false, message: "No file uploaded" });
@@ -91,7 +92,7 @@ const getAllDocuments = (req, res) => {
 
 const getAllDocumentsByUser = async (req, res) => {
   try {
-    const user = await userModel.findById(req.params.id).select("classIds");
+    const user = await userModel.findById(req.session.user.id).select("classIds");
     const documents = await documentModel.find({
       $or: [
         { ownerType: "student", ownerId: user._id },

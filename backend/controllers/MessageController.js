@@ -1,8 +1,10 @@
 import messageModel from "../models/Messages.js";
+import { runGraph } from "../planner/langgraph.js";
 
 const addMessage = async (req, res) => {
   try {
     const { conversationId, role, text, sources, confidence, trace } = req.body;
+    const userId = req.session.user.id;
 
     if (!conversationId || !role || !text) {
       return res.json({
@@ -22,17 +24,22 @@ const addMessage = async (req, res) => {
 
     await newMessage.save();
 
-    const reply = new messageModel({
+   const result = await runGraph(text, userId);
+  
+    const assistantMsg = new messageModel({
       conversationId,
       role: "assistant",
-      text: "Currently, i am not working will update soon!",
-      sources: sources || [],
+      text: result.answer,
+      sources: [
+           ...(result.internalSources || []).slice(0,5).map(c => ({ docId: c.docId, chunkId: c._id })),
+        ...(result.externalSources || []).slice(0,5).map(e => ({ source: e.source }))
+      ],
       confidence: confidence || null,
       trace: trace || null,
     })
-    await reply.save();
+    await assistantMsg.save();
 
-    res.json({ success: true, message: "Message added", reply });
+    res.json({ success: true, message: "Message added", reply: assistantMsg });
   } catch (error) {
     res.json({ success: false, message: error.message });
   }

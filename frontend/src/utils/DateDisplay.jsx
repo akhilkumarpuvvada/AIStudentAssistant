@@ -1,4 +1,3 @@
-import React from 'react'
 
 const DateDisplay = ({value}) => {
     console.log(value);

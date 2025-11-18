@@ -1,40 +1,50 @@
 import { Trash2 } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import DateDisplay from "../utils/DateDisplay";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
+import Loader from "../components/Loader";
+
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { api, currentUser, setCurrentUser } = useAppContext();
 
   const fetchUsers = async () => {
     try {
-      setLoading(true);
-      const { data } = await axios.get("http://localhost:5000/api/user");
+      const { data } = await api.get("/user");
       if (data.success) {
         setUsers(data.data);
       }
     } catch (error) {
-      console.log(error.message);
-    } finally {
-      setLoading(false);
-    }
+      toast.error(error.message);
+    } 
   };
 
   const handleRoleChange = async (id, newRole) => {
     try {
-      await axios.put(`http://localhost:5000/api/user/update/${id}`, { role: newRole });
+      await api.put(
+        `/user/update/${id}`,
+        {
+          role: newRole,
+        },
+      );
       fetchUsers();
+      if(currentUser && currentUser.id === id) {
+        setCurrentUser((prev) => ({ ...prev, role: newRole}))
+      }
     } catch (err) {
-      console.log(err);
+      toast.error(err);
     }
   };
 
   const handleDeleteUser = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/user/delete/${id}`);
+      await api.delete(`/user/delete/${id}`, {
+      });
       fetchUsers();
+      toast.success("User deleted Successfully!")
     } catch (err) {
       console.log(err);
     }
@@ -42,15 +52,15 @@ const AllUsers = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  });
 
   const roles = ["student", "teacher", "admin"];
 
   return (
     <div className="p-10 min-h-screen bg-gray-100">
       <p className="text-3xl font-bold mb-6">All Users</p>
-      {loading ? (
-        <p>Loading ....</p>
+      {!users.length > 0 ? (
+        <Loader text= "users" />
       ) : (
         <div className="overflow-x-auto bg-white shadow rounded-xl">
           <table className="w-full text-left">

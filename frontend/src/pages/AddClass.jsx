@@ -1,41 +1,35 @@
 import React, { useState } from "react";
 import { useUsersByRole } from "../hooks/UserByRole";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
 const AddClass = () => {
   const { students, teachers } = useUsersByRole();
-const navigate = useNavigate();
   const [name, setName] = useState("");
   const [teacher, setTeacher] = useState("");
   const [student, setStudent] = useState("");
-
-  console.log("Selected teacher ID:", teacher);
-  console.log("Selected student ID:", student);
+  const { navigate, api } = useAppContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Sending:", { name, teacherId: teacher, studentId: student });
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/class/add", {
+      const { data } = await api.post("/class/add", {
         name,
-        teacherId: teacher, 
-        studentId: student, 
+        teacherId: teacher,
+        studentId: student,
       });
 
       if (data.success) {
-        alert("Class saved successfully!");
+        toast.success("Class Added successfully!");
         setName("");
         setTeacher("");
         setStudent("");
-        navigate("/classes")
+        navigate("/classes");
       } else {
-        alert(data.message || "Failed to save class");
+        toast.error(data.message || "Failed to save class");
       }
     } catch (err) {
-      console.error(err);
-      alert("Error saving class");
+      toast.error(`${err} saving class` );
     }
   };
 
@@ -46,7 +40,6 @@ const navigate = useNavigate();
     >
       <h2 className="text-2xl font-semibold text-gray-800">Add Class</h2>
 
-      {/* Class Name */}
       <div className="w-full">
         <label className="block text-sm font-medium text-gray-600">
           Class Name

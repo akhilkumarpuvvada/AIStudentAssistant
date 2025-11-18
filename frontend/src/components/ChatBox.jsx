@@ -1,37 +1,17 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { assets } from "../assets/assets";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import Message from "./Message";
+import { useAppContext } from "../context/AppContext";
 
 const ChatBox = () => {
   const [searchParams] = useSearchParams();
   const conversationId = searchParams.get("conversationId");
-  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [prompt, setPrompt] = useState("");
+  const { messages, setMessages} = useAppContext();
 
-  const fetchMessages = useCallback(async () => {
-    if (!conversationId) return;
-    try {
-      setLoading(true);
-      const { data } = await axios.get(
-        `http://localhost:5000/api/message/${conversationId}`
-      );
-
-      if (data.success) {
-        setMessages(data.data);
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  }, [conversationId]);
-
-  useEffect(() => {
-    fetchMessages();
-  }, [fetchMessages]);
 
   useEffect(() => {
     const chatArea = document.querySelector(".chat-area");
@@ -48,12 +28,18 @@ const ChatBox = () => {
 
       const { data } = await axios.post(
         "http://localhost:5000/api/message/add",
-        { conversationId, text: prompt, role: "user" }
+        {
+          conversationId,
+          text: prompt,
+          role: "user",
+          userId: "68df9a9a5e21187fbed174e7",
+        },
+         { withCredentials: true }
       );
 
       if (data.success) {
-        setMessages((prev) => [...prev, data.reply]);
         setPrompt("");
+        setMessages((prev) => [...prev, data.reply]);
       }
     } catch (error) {
       console.log(error);

@@ -35,10 +35,33 @@ const addClass = async (req, res) => {
 };
 
 const getAllClasses = async (req, res) => {
+  const user = req.session.user;
   try {
-    const classes = await classModel.find({}).populate("studentIds", "name").populate("teacherIds", "name");
-    if (classes) {
-      res.json({ success: true, data: classes });
+    if (user.role === "admin") {
+      const classes = await classModel
+        .find({})
+        .populate("studentIds", "name")
+        .populate("teacherIds", "name");
+      if (classes) {
+        res.json({ success: true, data: classes });
+      }
+      if (user.role === "teacher") {
+        const classes = await userModel
+          .find({ teacherIds: user.id })
+          .populate("studentIds", "name email");
+        if (classes) {
+          res.json({ success: true, data: classes });
+        }
+      }
+
+      if (user.role === "student") {
+        const classes = await userModel
+          .find({ studentIds: user.id })
+          .populate("teacherIds", "name email");
+        if (classes) {
+          res.json({ success: true, data: classes });
+        }
+      }
     }
   } catch (error) {
     res.json({ success: false, message: error.message });
@@ -79,20 +102,22 @@ const deleteClass = async (req, res) => {
   const classId = req.params.id;
   try {
     const cls = await classModel.findById(classId);
-    if(!cls) {
-      return res.status(404).json({success: false, message: "Class not found"})
+    if (!cls) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Class not found" });
     }
 
     await userModel.updateMany(
-      { _id: {$in: cls.studentIds}},
-      { $pull: { classIds: classId}}
-    )
-    
+      { _id: { $in: cls.studentIds } },
+      { $pull: { classIds: classId } }
+    );
+
     await userModel.updateMany(
-      { _id: { $in: cls.teacherIds}},
-      { $pull: { classIds: classId}}
-    )
-    
+      { _id: { $in: cls.teacherIds } },
+      { $pull: { classIds: classId } }
+    );
+
     await classModel.findByIdAndDelete(classId);
     res.json({ success: true, message: "Class deleted Successfully" });
   } catch (error) {

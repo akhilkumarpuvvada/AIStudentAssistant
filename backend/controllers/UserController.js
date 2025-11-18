@@ -1,20 +1,23 @@
 import bcrypt from "bcrypt";
 import userModel from "../models/User.js";
 
-// Add User
 const addUser = async (req, res) => {
   try {
-    const { name, email, role, classId, password } = req.body;
+    const { name, email, role, classId } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ success: false, message: "Missing fields" });
+    if (!name || !email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing fields" });
     }
 
     const isUserAlreadyAvailable = await userModel.findOne({ email });
     if (isUserAlreadyAvailable) {
-      return res.status(400).json({ success: false, message: "User already available" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User already available" });
     }
-
+    const password = "123";
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new userModel({
@@ -32,7 +35,6 @@ const addUser = async (req, res) => {
   }
 };
 
-// Get All Users
 const getAllUsers = async (_req, res) => {
   try {
     const users = await userModel.find({}).populate("classIds", "name");
@@ -42,18 +44,22 @@ const getAllUsers = async (_req, res) => {
   }
 };
 
-// Get User by ID
+
 const getUserById = async (req, res) => {
+  
   try {
-    const user = await userModel.findById(req.params.id);
-    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    const user = await userModel.findById(req.params.id);    
+    if (!user)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     res.json({ success: true, data: user });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Update User
+
 const updateUser = async (req, res) => {
   try {
     const updatedUser = await userModel.findByIdAndUpdate(
@@ -61,32 +67,46 @@ const updateUser = async (req, res) => {
       req.body,
       { new: true }
     );
-    if (!updatedUser) return res.status(404).json({ success: false, message: "User not found" });
+    if (!updatedUser)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     res.json({ success: true, data: updatedUser });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Delete User
 const deleteUser = async (req, res) => {
   try {
     const deleted = await userModel.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ success: false, message: "User not found" });
+    if (!deleted)
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     res.json({ success: true, message: "User deleted" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-// Role-based filters
-const getUsersByRole = async (req, res) => {  
+
+const getUsersByRole = async (req, res) => {
   try {
-    const users = await userModel.find({ role: req.params.role }).populate("classIds", "name");
+    const users = await userModel
+      .find({ role: req.params.role })
+      .populate("classIds", "name");
     res.json({ success: true, data: users });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-export { addUser, getAllUsers, getUserById, updateUser, deleteUser, getUsersByRole };
+export {
+  addUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  getUsersByRole,
+};

@@ -1,22 +1,15 @@
 import conversationModel from "../models/Conversation.js";
 import messageModel from "../models/Messages.js";
 
-// 1. Create new conversation
 const createConversation = async (req, res) => {
   try {
-    const { userId, classId } = req.body;
-
-    if (!userId) {
-      return res.json({
-        success: false,
-        message: "userId and title are required",
-      });
-    }
-
+    const { classId } = req.body;
+    const user = req.session.user;
+    const userId = user.id;
     const newConversation = new conversationModel({
       userId,
       classId: classId || null,
-      title : "New Chat",
+      title: "New Chat",
     });
 
     await newConversation.save();
@@ -32,8 +25,7 @@ const createConversation = async (req, res) => {
 
 const getConversationsByUser = async (req, res) => {
   try {
-    const { userId } = req.params;
-    
+    const userId = req.session.user.id;
     const conversations = await conversationModel
       .find({ userId })
       .sort({ createdAt: -1 });
@@ -68,12 +60,12 @@ const deleteConversation = async (req, res) => {
     const { id } = req.params;
 
     const conversation = await conversationModel.findById(id);
-    
+
     if (!conversation) {
       return res.json({ success: false, message: "Conversation not found" });
     }
 
-    await messageModel.deleteMany({ conversationId: id }); 
+    await messageModel.deleteMany({ conversationId: id });
     await conversationModel.findByIdAndDelete(id);
 
     res.json({ success: true, message: "Conversation and messages deleted" });
